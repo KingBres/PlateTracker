@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>License Plate Tracker</title>
+    <!-- Search Filter -->
+    <input type="text" id="state-search" placeholder="Search for a state..." />
+
+    <style>
+      /* CSS styles */
+      #states-list {
+        column-count: 2;
+        column-gap: 20px;
+        font-family: Arial, sans-serif;
+      }
+      label {
+        display: block;
+        margin: 5px 0;
+      }
+
+      label {
+        display: flex; /* Ensures label items stay on one line */
+        align-items: center;
+      }
+
+      #progress-container {
+        margin-bottom: 20px;
+        font-family: Arial, sans-serif;
+      }
+
+      #progress-bar {
+        width: 100%;
+        height: 20px;
+      }
+
+      #progress-percent {
+        font-weight: bold;
+        margin-left: 10px;
+      }
+      #reset-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+      }
+
+      #reset-button:hover {
+        background-color: #990000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Track License Plates Across America</h1>
+
+    <!-- Progress Bar -->
+    <div id="progress-container">
+      <label for="progress-bar">Progress:</label>
+      <progress id="progress-bar" value="0" max="50"></progress>
+      <span id="progress-percent">0%</span>
+    </div>
+    <!-- Reset Button -->
+    <button id="reset-button">Reset Progress</button>
+
+    <!-- Checklist of States -->
+    <div id="states-list">
+      <label><input type="checkbox" /> Alabama</label><br />
+      <label><input type="checkbox" /> Alaska</label><br />
+      <label><input type="checkbox" /> Arizona</label><br />
+      <label><input type="checkbox" /> Arkansas</label><br />
+      <label><input type="checkbox" /> California</label><br />
+      <label><input type="checkbox" /> Colorado</label><br />
+      <label><input type="checkbox" /> Connecticut</label><br />
+      <label><input type="checkbox" /> Delaware</label><br />
+      <label><input type="checkbox" /> Florida</label><br />
+      <label><input type="checkbox" /> Georgia</label><br />
+      <label><input type="checkbox" /> Hawaii</label><br />
+      <label><input type="checkbox" /> Idaho</label><br />
+      <label><input type="checkbox" /> Illinois</label><br />
+      <label><input type="checkbox" /> Indiana</label><br />
+      <label><input type="checkbox" /> Iowa</label><br />
+      <label><input type="checkbox" /> Kansas</label><br />
+      <label><input type="checkbox" /> Kentucky</label><br />
+      <label><input type="checkbox" /> Louisiana</label><br />
+      <label><input type="checkbox" /> Maine</label><br />
+      <label><input type="checkbox" /> Maryland</label><br />
+      <label><input type="checkbox" /> Massachusetts</label><br />
+      <label><input type="checkbox" /> Michigan</label><br />
+      <label><input type="checkbox" /> Minnesota</label><br />
+      <label><input type="checkbox" /> Mississippi</label><br />
+      <label><input type="checkbox" /> Missouri</label><br />
+      <label><input type="checkbox" /> Montana</label><br />
+      <label><input type="checkbox" /> Nebraska</label><br />
+      <label><input type="checkbox" /> Nevada</label><br />
+      <label><input type="checkbox" /> New Hampshire</label><br />
+      <label><input type="checkbox" /> New Jersey</label><br />
+      <label><input type="checkbox" /> New Mexico</label><br />
+      <label><input type="checkbox" /> New York</label><br />
+      <label><input type="checkbox" /> North Carolina</label><br />
+      <label><input type="checkbox" /> North Dakota</label><br />
+      <label><input type="checkbox" /> Ohio</label><br />
+      <label><input type="checkbox" /> Oklahoma</label><br />
+      <label><input type="checkbox" /> Oregon</label><br />
+      <label><input type="checkbox" /> Pennsylvania</label><br />
+      <label><input type="checkbox" /> Rhode Island</label><br />
+      <label><input type="checkbox" /> South Carolina</label><br />
+      <label><input type="checkbox" /> South Dakota</label><br />
+      <label><input type="checkbox" /> Tennessee</label><br />
+      <label><input type="checkbox" /> Texas</label><br />
+      <label><input type="checkbox" /> Utah</label><br />
+      <label><input type="checkbox" /> Vermont</label><br />
+      <label><input type="checkbox" /> Virginia</label><br />
+      <label><input type="checkbox" /> Washington</label><br />
+      <label><input type="checkbox" /> West Virginia</label><br />
+      <label><input type="checkbox" /> Wisconsin</label><br />
+      <label><input type="checkbox" /> Wyoming</label><br />
+    </div>
+
+    <script>
+      // JavaScript functionality
+      const statesList = document.getElementById("states-list");
+      const savedStates = JSON.parse(localStorage.getItem("seenStates")) || {};
+
+      function initializeChecklist() {
+        const labels = statesList.querySelectorAll("label");
+        labels.forEach((label) => {
+          const checkbox = label.querySelector("input[type='checkbox']");
+          const stateName = label.textContent.trim();
+          checkbox.checked = savedStates[stateName] || false;
+          checkbox.addEventListener("change", () => {
+            savedStates[stateName] = checkbox.checked;
+            localStorage.setItem("seenStates", JSON.stringify(savedStates));
+            updateProgress(); // Update progress after each change
+          });
+        });
+      }
+
+      const progressBar = document.getElementById("progress-bar");
+      const progressPercent = document.getElementById("progress-percent");
+
+      function updateProgress() {
+        const totalStates = Object.keys(savedStates).length;
+        const seenStatesCount = Object.values(savedStates).filter(
+          (seen) => seen
+        ).length;
+        progressBar.value = seenStatesCount;
+        progressPercent.textContent = `${Math.round(
+          (seenStatesCount / totalStates) * 100
+        )}%`;
+      }
+
+      initializeChecklist();
+      updateProgress();
+
+      // Select the reset button
+      const resetButton = document.getElementById("reset-button");
+
+      resetButton.addEventListener("click", () => {
+        // Clear local storage
+        localStorage.removeItem("seenStates");
+
+        // Uncheck all checkboxes
+        const checkboxes = statesList.querySelectorAll(
+          "input[type='checkbox']"
+        );
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = false;
+        });
+
+        // Reset the progress bar
+        progressBar.value = 0;
+        progressPercent.textContent = "0%";
+      });
+
+      // State search functionality
+      const searchInput = document.getElementById("state-search");
+
+      searchInput.addEventListener("input", () => {
+        const searchTerm = searchInput.value.toLowerCase();
+        const labels = statesList.querySelectorAll("label");
+
+        labels.forEach((label) => {
+          const stateName = label.textContent.trim().toLowerCase();
+          if (stateName.includes(searchTerm)) {
+            label.style.display = "block"; // Show matching state
+          } else {
+            label.style.display = "none"; // Hide non-matching state
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
